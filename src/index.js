@@ -1,8 +1,14 @@
-// Importing the getRandomValues function from the random.js file
-import getRandomValues from "./random.js";
+// const crypto = require("crypto");
 
-// Defining the generatePassword function with default parameters
-export default function generatePassword({
+
+function getRandomValues(size) {
+    // Using browsers crypto module for getting random values
+    return window.crypto.getRandomValues(new Uint8Array(size));
+    // return crypto.randomBytes(size);
+}
+
+// Omgopass logic-  Not used in our application 
+export function omgopassLogic({
     syllablesCount = 3,
     minSyllableLength = 2,
     maxSyllableLength = 3,
@@ -55,4 +61,38 @@ export default function generatePassword({
         // Appending a separator to the syllable if not the first syllable
         return i && separators ? separators[random(separators.length)] + syllable : syllable;
     });
+}
+
+
+// This logic is used in our application to generate password
+export function vectopassLogic({
+    length = 12, // default password length
+    hasUpperCase = true,
+    hasLowerCase = true,
+    hasNumbers = true,
+    hasSpecialChars = true
+} = {}) {
+    let charset = "";
+
+    // Add characters based on options
+    if (hasUpperCase) charset += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    if (hasLowerCase) charset += "abcdefghijklmnopqrstuvwxyz";
+    if (hasNumbers) charset += "0123456789";
+    if (hasSpecialChars) charset += "!@#$%^&*()_+-=[]{}|;:,.<>?/~";
+
+    // If no character type is selected, use default
+    if (charset === "") {
+        charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?/~";
+    }
+
+    const charsetLength = charset.length;
+
+    // Generate password
+    let password = "";
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(window.crypto.getRandomValues(new Uint32Array(1))[0] / (0xffffffff + 1) * charsetLength);
+        password += charset.charAt(randomIndex);
+    }
+
+    return password;
 }

@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/epi-uditsingh/vectopass/issues"
   },
-  "homepage": "https://github.com/epi-uditsingh/vectopass#readme"
+  "homepage": "https://github.com/epi-uditsingh/vectopass#readme",
+  "dependencies": {
+    "benchmark": "^2.1.4"
+  }
 }
