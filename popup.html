@@ -11,31 +11,14 @@
 <body>
     <div class="container">
         <h1>Password Generator</h1>
-        <div class="options">
-            <label for="length">Length:</label>
-            <input type="number" id="length" min="12" max="50" value="12">
-
-            <label for="has-uppercase">Has Upper Case:</label>
-            <input type="checkbox" id="has-uppercase" checked>
-
-            <label for="has-lowercase">Has Lower Case:</label>
-            <input type="checkbox" id="has-lowercase" checked>
-            <label for="has-numbers">Include Numbers:</label>
-            <input type="checkbox" id="has-numbers" checked>
-
-            <label for="special-char">include Special Chars:</label>
-            <input type="checkbox" id="special-char" checked>
-        </div>
-
         <div class="password-display">
             <input type="text" id="password" readonly>
             <button id="copy-btn">Copy</button>
             <button id="generate-btn">Generate Password</button>
-            <div id="strength-meter"></div>
-            <div id="error-message" style="color: red; display: none;"></div>
         </div>
     </div>
     <script src="popup.js" type="module"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
 </body>
 
 </html>

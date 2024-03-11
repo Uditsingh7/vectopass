@@ -1,11 +1,22 @@
 {
-    "manifest_version": 3,
-    "name": "Password Generator",
-    "version": "1.0",
-    "description": "Generate strong passwords with ease.",
-    "action": {
-      "default_popup": "popup.html"
-    },
-    "permissions": ["activeTab"]
-  }
-  
+  "manifest_version": 3,
+  "name": "Password Generator",
+  "version": "1.0",
+  "permissions": [
+    "activeTab"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "contentScript.js"
+      ],
+      "module": "module"
+    }
+  ]
+}
