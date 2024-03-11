@@ -66,7 +66,7 @@ export function omgopassLogic({
 
 // This logic is used in our application to generate password
 export function vectopassLogic({
-    length = 12, // default password length
+    length = 16, // default password length
     hasUpperCase = true,
     hasLowerCase = true,
     hasNumbers = true,
