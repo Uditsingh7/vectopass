@@ -1,21 +1,112 @@
-// Function to display a notification message
-function displayNotification(message) {
-    const notification = document.createElement('div');
-    notification.textContent = message;
-    notification.style.cssText = `
-        position: fixed;
-        top: 10px;
-        right: 10px;
+// UI component to show the text box containing the password suggestion
+function displayPasswordSuggestionBox(passwordGen, message = "") {
+    let passwordInput = passwordGen;
+    const suggestionBox = document.createElement('div');
+    suggestionBox.style.cssText = `
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        font-family: Arial, sans-serif;
         padding: 10px;
-        background-color: #333;
-        color: #fff;
+        border: 1px solid #ccc;
         border-radius: 5px;
-        z-index: 9999;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        background-color: white;
+        z-index: 999;
+        justify-content: center;
+        align-items: center;
     `;
-    document.body.appendChild(notification);
-    setTimeout(() => {
-        notification.remove();
-    }, 5000); // Remove notification after 5 seconds
+    // Adding headline to the suggestion box
+    const headline = document.createElement('h2');
+    headline.id = 'suggestion-headline';
+    headline.textContent = message;
+    headline.style.cssText = `
+    margin: 5px;
+    font-size: 12px;
+    `
+    suggestionBox.appendChild(headline);
+
+    // Creating the inner box which contains the passoword
+    const innerBox = document.createElement('div');
+    innerBox.id = `suggestion-box-password`;
+    innerBox.textContent = passwordInput;
+    innerBox.style.cssText = `
+        width: 80%;
+        word-break: break-all;
+        margin-right: 5px;
+        padding: 50px
+        color: grey;
+        font-weight: bold;
+        font-size: 16px;
+        background-color: #f5f5f5;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        text-align: center;
+         
+    `
+
+    innerBox.addEventListener("click", () => {
+        // Call the autofillPasswords function with the password input field
+        autofillPasswords(passwordInput);
+        document.body.removeChild(suggestionBox);
+    });
+
+
+    suggestionBox.appendChild(innerBox);
+    // Add hover effect to the inner box
+    innerBox.addEventListener('mouseenter', () => {
+        innerBox.style.backgroundColor = '#f0f0f0';
+    });
+    innerBox.addEventListener('mouseleave', () => {
+        innerBox.style.backgroundColor = ''; // Reset background color
+    });
+
+    const refreshIcon = document.createElement('span');
+    refreshIcon.textContent = '\u27F3'; // Unicode character for refresh icon
+    refreshIcon.style.cssText = `
+        cursor: pointer;
+        font-size: 20px;
+        color: #007bff;
+    `;
+    refreshIcon.addEventListener('click', () => {
+        passwordInput = vectopassLogic(); // Function to generate new password suggestion
+        innerBox.textContent = passwordInput;
+    });
+    suggestionBox.appendChild(refreshIcon);
+
+    const cancelIcon = document.createElement('span');
+    cancelIcon.textContent = '✖'; // Unicode character for cancel icon
+    cancelIcon.style.cssText = `
+        cursor: pointer;
+        font-size: 20px;
+        color: #007bff;
+        position: absolute;
+        top: 5px;
+        right: 5px;
+    `;
+    cancelIcon.addEventListener('click', () => {
+        document.body.removeChild(suggestionBox);
+    });
+    suggestionBox.appendChild(cancelIcon);
+
+    // Get width of the input password field and set suggestion box width accordingly
+    const passwordField = document.querySelector('input[type="password"]');
+    if (passwordField) {
+        const inputFieldWidth = window.getComputedStyle(passwordField).width;
+        suggestionBox.style.width = inputFieldWidth;
+        // Identify the input passwords bottom and add the suggestion text below it 
+        
+        // Get the bottom line of the password input field
+        const inputBottom = passwordField.getBoundingClientRect().bottom;
+
+        suggestionBox.style.top = inputBottom + 'px';
+        suggestionBox.style.left = passwordField.getBoundingClientRect().left + 'px';
+    }
+    // Now place this below a password input field
+    document.body.appendChild(suggestionBox);
 }
 
 function vectopassLogic({
@@ -50,20 +141,22 @@ function vectopassLogic({
     return password;
 }
 
-// Function to autofill password fields with a generated password
-function autofillPasswords() {
-    // Generate a random password
-    const generatedPassword = vectopassLogic({});
+// Function to autofill marked password fields with the generated password
+function autofillPasswords(passwordVal) {
+    // Find all password fields marked with the custom attribute
+    const markedPasswordFields = document.querySelectorAll('input[data-password-field="true"]');
 
-    // Find all password input fields on the page
-    const passwordFields = document.querySelectorAll('input[type="password"]');
+    // Autofill each marked password field with the generated password
+    markedPasswordFields.forEach(field => {
+        // Set the value of the password field
+        field.value = passwordVal;
 
-    // Autofill each password field with the generated password
-    passwordFields.forEach(field => {
-        field.value = generatedPassword;
-        field.dispatchEvent(new Event('input', { bubbles: true }));
+        // Trigger the input event manually
+        const event = new Event('input', { bubbles: true });
+        field.dispatchEvent(event);
     });
 }
+
 
 // Function to check if the current page resembles a sign-up page
 function isSignUpPage() {
@@ -89,6 +182,17 @@ function isSignUpPage() {
     return isSignUpPage;
 }
 
+// Function to mark password fields with a custom attribute
+function markPasswordFields() {
+    // Find all password input fields on the page, regardless of their current type
+    const passwordFields = document.querySelectorAll('input[type="password"]');
+
+    // Mark each password field with a custom attribute
+    passwordFields.forEach(field => {
+        field.setAttribute('data-password-field', 'true');
+    });
+}
+
 
 
 
@@ -97,19 +201,45 @@ function isSignUpPage() {
 function handlePasswordGeneration() {
     // Display a confirmation dialog
     if (isSignUpPage()) {
-        // Autofill password fields with the generated password
-        autofillPasswords();
-        // Display a notification indicating that a strong password has been generated
-        displayNotification("A strong password has been generated for you.");
+        markPasswordFields();
+        const password = vectopassLogic();
+        const message = `VectoPass has generated a strong passoword for you`
+        displayPasswordSuggestionBox(password, message);
     }
 }
+
 
 // Execute the password generation logic when the content script is injected into a page
 handlePasswordGeneration();
 
+let timeId;
+// Here i need to check if the tab has no activity for 10 sec and then update the details
+function startGeneratingStrongPass(time, message) {
+    timeId = setInterval(() => {
+        // Generate a new password suggestion
+        const genPass = vectopassLogic();
 
-// Test function to generate  a random string of characters
-function generatePassword() {
-    return `${Math.random().toString(36).substring(2) +
-        Math.random().toString(36).replace(/[0.]/g, '').substring(0, 5)}`;
+        // Update the content of the password suggestion box
+        const passGenBox = document.getElementById("suggestion-box-password");
+        if (passGenBox) {
+            passGenBox.textContent = genPass;
+        }
+
+        // Update the content of the password suggestion box container
+        const suggestionHeadline = document.getElementById("suggestion-headline");
+        if (suggestionHeadline) {
+            suggestionHeadline.textContent = message;
+        }
+    }, time)
 }
+
+
+// check if tab is active or not
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden && isSignUpPage()) {
+        startGeneratingStrongPass(5000, "A strong new password has been generated!!");
+    } else {
+        // Clear the interval
+        clearInterval(timeId);
+    }
+});
